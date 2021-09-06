@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:mr_note_clone/models/settingsdb.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../models/settingsdb.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _databaseHelper;
@@ -58,6 +59,6 @@ class DatabaseHelper {
     Database db = await _getDatabase();
     List<Map<String, dynamic>> settingsMapList =
         await db.rawQuery("SELECT * FROM settings");
-    return SettingsDb.fromListMap(settingsMapList);
+    return SettingsDb.fromMap(settingsMapList[0]);
   }
 }

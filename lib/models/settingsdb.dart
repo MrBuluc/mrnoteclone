@@ -5,9 +5,14 @@ class SettingsDb {
 
   SettingsDb(this.password, this.theme, this.sort);
 
-  SettingsDb.fromListMap(List<Map<String, dynamic>> settingsMapList) {
-    this.password = settingsMapList[0]["value"];
-    this.theme = settingsMapList[1]["value"];
-    this.sort = settingsMapList[2]["value"];
+  SettingsDb.fromMap(Map<String, dynamic> settingsMap) {
+    this.password = settingsMap["password"];
+    this.theme = settingsMap["theme"];
+    this.sort = settingsMap["sort"];
+  }
+
+  @override
+  String toString() {
+    return 'SettingsDb{password: $password, theme: $theme, sort: $sort}';
   }
 }
