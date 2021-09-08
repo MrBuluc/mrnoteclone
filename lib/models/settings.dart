@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class Settings {
   static Settings _settings;
+  String password;
   Color currentColor;
   String sort;
 

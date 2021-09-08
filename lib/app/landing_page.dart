@@ -3,6 +3,7 @@ import 'package:mr_note_clone/common_widget/merkez_widget.dart';
 import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/models/settingsdb.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
+import 'package:mr_note_clone/ui/Login/login.dart';
 
 class LandingPage extends StatefulWidget {
   @override
@@ -13,8 +14,6 @@ class _LandingPageState extends State<LandingPage> {
   DatabaseHelper databaseHelper = DatabaseHelper();
 
   bool flag = false;
-
-  String truePassword;
 
   Settings settings = Settings();
 
@@ -32,6 +31,7 @@ class _LandingPageState extends State<LandingPage> {
       // } else {
       //   return HomePage();
       // }
+      return Login();
     } else {
       return Scaffold(
         backgroundColor: Color(0xff84b7f1),
@@ -64,9 +64,7 @@ class _LandingPageState extends State<LandingPage> {
 
   Future<bool> read() async {
     SettingsDb settingsDb = await databaseHelper.getSettings();
-    setState(() {
-      truePassword = settingsDb.password;
-    });
+    settings.password = settingsDb.password;
 
     try {
       int color = int.parse(settingsDb.theme);
@@ -82,6 +80,6 @@ class _LandingPageState extends State<LandingPage> {
     }
     setState(() {});
 
-    return truePassword != null && truePassword.isNotEmpty;
+    return settings.password != null && settings.password.isNotEmpty;
   }
 }
