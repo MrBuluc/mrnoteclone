@@ -10,7 +10,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   Settings settings = Settings();
 
-  String result = "";
+  String result = "", passwordStr;
+
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +59,7 @@ class _LoginState extends State<Login> {
                 offset: Offset(0, 3))
           ]),
       child: Form(
+        key: formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -71,6 +74,7 @@ class _LoginState extends State<Login> {
                       Icons.lock,
                       color: generalColor,
                     )),
+                onSaved: (String value) => passwordStr = value,
               ),
             ),
             buildSave()
@@ -95,6 +99,7 @@ class _LoginState extends State<Login> {
               "Giriş",
               style: headerStyle11,
             ),
+            onTap: () => enter(),
           ),
         ),
       ),
@@ -110,5 +115,20 @@ class _LoginState extends State<Login> {
         textAlign: TextAlign.center,
       ),
     );
+  }
+
+  void enter() {
+    formKey.currentState.save();
+
+    if (passwordStr == settings.password)
+      // Navigator.pushReplacement(
+      //     context, MaterialPageRoute(builder: (context) => HomePage()));
+      setState(() {
+        result = "Doğru Parola";
+      });
+    else
+      setState(() {
+        result = "Yanlış Parola";
+      });
   }
 }
