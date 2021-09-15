@@ -16,4 +16,14 @@ class Settings {
   }
 
   Settings.internal();
+
+  Color switchBackgroundColor() {
+    switch (currentColor.hashCode) {
+      //Siyah renk
+      case 4278190080:
+        return Colors.grey.shade600;
+      default:
+        return Colors.white;
+    }
+  }
 }

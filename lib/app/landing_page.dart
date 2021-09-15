@@ -3,6 +3,7 @@ import 'package:mr_note_clone/common_widget/merkez_widget.dart';
 import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/models/settingsdb.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
+import 'package:mr_note_clone/ui/Home_Page/home_page.dart';
 import 'package:mr_note_clone/ui/Login/login.dart';
 
 class LandingPage extends StatefulWidget {
@@ -26,12 +27,11 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     if (settings.currentColor != null && settings.sort != null) {
-      // if (flag) {
-      //   return Login();
-      // } else {
-      //   return HomePage();
-      // }
-      return Login();
+      if (flag) {
+        return Login();
+      } else {
+        return HomePage();
+      }
     } else {
       return Scaffold(
         backgroundColor: Color(0xff84b7f1),
