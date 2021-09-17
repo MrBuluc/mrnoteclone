@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/settings.dart';
+import 'package:mr_note_clone/ui/Home_Page/home_page.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -121,11 +122,8 @@ class _LoginState extends State<Login> {
     formKey.currentState.save();
 
     if (passwordStr == settings.password)
-      // Navigator.pushReplacement(
-      //     context, MaterialPageRoute(builder: (context) => HomePage()));
-      setState(() {
-        result = "Doğru Parola";
-      });
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomePage()));
     else
       setState(() {
         result = "Yanlış Parola";

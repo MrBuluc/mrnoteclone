@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
 import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/settings.dart';
+import 'package:mr_note_clone/services/database_helper.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,26 +14,44 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Settings settings = Settings();
 
-  List<Category> allCategories = [Category("Tüm Notlar", 4289760505)];
+  List<Category> allCategories = [];
+
+  DatabaseHelper databaseHelper = DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SafeArea(
-        child: Scaffold(
-      backgroundColor: settings.currentColor,
-      body: ListView(
-        children: [
-          SizedBox(
-            height: 25,
-          ),
-          header(),
-          categoriesAndNew(),
-          buildCategories(size),
-          // Notes()
-        ],
-      ),
-    ));
+    if (allCategories.isEmpty) updateCategoryList();
+    return WillPopScope(
+      onWillPop: () {
+        return _areYouSureforExit();
+      },
+      child: SafeArea(
+          child: Scaffold(
+        backgroundColor: settings.currentColor,
+        body: ListView(
+          children: [
+            SizedBox(
+              height: 25,
+            ),
+            header(),
+            categoriesAndNew(),
+            buildCategories(size),
+            // Notes()
+          ],
+        ),
+      )),
+    );
+  }
+
+  void updateCategoryList() {
+    databaseHelper.getCategoryList().then((categoryList) {
+      categoryList.insert(
+          0, Category.withID(0, "Tüm Notlar", settings.currentColor.value));
+      setState(() {
+        allCategories = categoryList;
+      });
+    });
   }
 
   Widget header() {
@@ -140,6 +160,17 @@ class _HomePageState extends State<HomePage> {
       default:
         return headerStyle4;
     }
+  }
+
+  Future<bool> _areYouSureforExit() async {
+    final sonuc = await PlatformDuyarliAlertDialog(
+      baslik: "Emin misiniz?",
+      icerik: "Mr. Note Clone dan çıkmak istediğinize emin misiniz?",
+      anaButonYazisi: "ÇIK",
+      iptalButonYazisi: "İPTAL",
+    ).goster(context);
+
+    return Future.value(sonuc);
   }
 }
 

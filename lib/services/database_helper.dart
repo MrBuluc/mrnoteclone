@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:mr_note_clone/models/category.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -60,5 +61,15 @@ class DatabaseHelper {
     List<Map<String, dynamic>> settingsMapList =
         await db.rawQuery("SELECT * FROM settings");
     return SettingsDb.fromMap(settingsMapList[0]);
+  }
+
+  Future<List<Category>> getCategoryList() async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> categoryMapList = await db.query("category");
+    List<Category> categoryList = [];
+    for (Map map in categoryMapList) {
+      categoryList.add(Category.fromMap(map));
+    }
+    return categoryList;
   }
 }
