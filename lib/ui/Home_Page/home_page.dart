@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
 import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
@@ -17,6 +18,10 @@ class _HomePageState extends State<HomePage> {
   List<Category> allCategories = [];
 
   DatabaseHelper databaseHelper = DatabaseHelper();
+
+  String newCategoryTitle;
+
+  Color currentColor = Colors.red;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +75,10 @@ class _HomePageState extends State<HomePage> {
               "Ara",
               style: headerStyle3,
             ),
-            onPressed: () {},
+            onPressed: () {
+              // Navigator.of(context)
+              //     .push(MaterialPageRoute(builder: (context) => SearchPage()));
+            },
           ),
           GestureDetector(
             child: Icon(
@@ -78,6 +86,15 @@ class _HomePageState extends State<HomePage> {
               color: Colors.grey.shade800,
               size: 30,
             ),
+            onTap: () async {
+              // String result = await Navigator.of(context).push(
+              //   MaterialPageRoute(builder: (context) => SettingsPage());
+              // );
+              // if (result != null)
+              //   updateCategoryList();
+              // else
+              //   setState(() {});
+            },
           )
         ],
       ),
@@ -101,11 +118,119 @@ class _HomePageState extends State<HomePage> {
                 "+Yeni",
                 style: headerStyle3,
               ),
+              onTap: () {
+                addCategoryDialog(context);
+              },
             )
           ],
         ),
       ),
     );
+  }
+
+  void addCategoryDialog(BuildContext context) {
+    GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text(
+              "Kategori Ekle",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            children: [
+              Form(
+                key: formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Kategori Adı",
+                        border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value.length < 3)
+                        return "Lütfen en az 3 karakter giriniz";
+                      else
+                        return null;
+                    },
+                    onSaved: (value) => newCategoryTitle = value,
+                  ),
+                ),
+              ),
+              changeColorWidget(context),
+              ButtonBar(
+                children: [
+                  ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(primary: Colors.orangeAccent),
+                    child: Text(
+                      "İptal ❌",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+                    child: Text(
+                      "Kaydet 💾",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  )
+                ],
+              )
+            ],
+          );
+        });
+  }
+
+  Widget changeColorWidget(BuildContext context) {
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter blockPickerState) {
+      return Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 26),
+            child: Text(
+              "Bir Renk Seç",
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor, fontSize: 20),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 80),
+            child: GestureDetector(
+              child: Container(
+                height: 30,
+                width: 30,
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: currentColor),
+              ),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Bir Renk Seç"),
+                        content: BlockPicker(
+                          pickerColor: currentColor,
+                          onColorChanged: (Color color) {
+                            Navigator.pop(context);
+                            blockPickerState(() => currentColor = color);
+                          },
+                        ),
+                      );
+                    });
+              },
+            ),
+          )
+        ],
+      );
+    });
   }
 
   Widget buildCategories(Size size) {
