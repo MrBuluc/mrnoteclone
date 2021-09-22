@@ -14,4 +14,14 @@ class Category {
 
   //db den okurken
   Category.withID(this.id, this.categoryTitle, this.color);
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = {};
+
+    map["categoryID"] = id;
+    map["categoryTitle"] = categoryTitle;
+    map["categoryColor"] = color;
+
+    return map;
+  }
 }

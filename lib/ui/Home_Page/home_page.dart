@@ -179,7 +179,23 @@ class _HomePageState extends State<HomePage> {
                       "Kaydet 💾",
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (formKey.currentState.validate()) {
+                        formKey.currentState.save();
+                        int value = await databaseHelper.addCategory(
+                            Category(newCategoryTitle, currentColor.value));
+                        if (value > 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Kategori başarıyla eklendi 👌"),
+                            duration: Duration(seconds: 2),
+                          ));
+                          Navigator.pop(context);
+                          setState(() {
+                            updateCategoryList();
+                          });
+                        }
+                      }
+                    },
                   )
                 ],
               )
@@ -271,10 +287,125 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            onTap: () {
+              // Navigator.of(context).push(MaterialPageRoute(
+              //     builder: (context) =>
+              //         CategoryPage(categoy: allCategories[index])));
+            },
+            onLongPress: () {
+              if (index != 0) {
+                editCategoryDialog(context, allCategories[index]);
+              }
+            },
           );
         },
       ),
     );
+  }
+
+  void editCategoryDialog(BuildContext context, Category category) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text(
+              "Kategori Düzenle",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                      labelText: "Kategori Adı", border: OutlineInputBorder()),
+                ),
+              ),
+              editColorWidget(context, category),
+              ButtonBar(
+                alignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.red),
+                    child: Text(
+                      "Kaldır",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  ),
+                  ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(primary: Colors.orangeAccent),
+                    child: Text(
+                      "İptal ❌",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.green),
+                    child: Text(
+                      "Kaydet 💾",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  )
+                ],
+              )
+            ],
+          );
+        });
+  }
+
+  Widget editColorWidget(BuildContext context, Category category) {
+    Color categoryColor = Color(category.color);
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter blockPickerState) {
+      return Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 26),
+            child: Text(
+              "Bir Renk Seç",
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor, fontSize: 20),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 80),
+            child: GestureDetector(
+              child: Container(
+                height: 30,
+                width: 30,
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: categoryColor),
+              ),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Bir Renk Seç"),
+                        content: SingleChildScrollView(
+                          child: BlockPicker(
+                            pickerColor: categoryColor,
+                            onColorChanged: (Color color) {
+                              Navigator.pop(context);
+                              blockPickerState(() {
+                                category.color = color.value;
+                                categoryColor = color;
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    });
+              },
+            ),
+          )
+        ],
+      );
+    });
   }
 
   TextStyle switchCategoriesTitleStyle() {

@@ -72,4 +72,10 @@ class DatabaseHelper {
     }
     return categoryList;
   }
+
+  Future<int> addCategory(Category category) async {
+    Database db = await _getDatabase();
+    int sonuc = await db.insert("category", category.toMap());
+    return sonuc;
+  }
 }
