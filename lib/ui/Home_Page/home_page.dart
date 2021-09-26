@@ -59,6 +59,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<bool> _areYouSureforExit() async {
+    final sonuc = await PlatformDuyarliAlertDialog(
+      baslik: "Emin misiniz?",
+      icerik: "Mr. Note Clone dan çıkmak istediğinize emin misiniz?",
+      anaButonYazisi: "ÇIK",
+      iptalButonYazisi: "İPTAL",
+    ).goster(context);
+
+    return Future.value(sonuc);
+  }
+
   Widget header() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 25),
@@ -303,7 +314,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  TextStyle switchCategoriesTitleStyle() {
+    switch (settings.currentColor.hashCode) {
+      //Siyah renk
+      case 4278190080:
+        return headerStyle4.copyWith(color: Colors.white);
+      default:
+        return headerStyle4;
+    }
+  }
+
   void editCategoryDialog(BuildContext context, Category category) {
+    GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -314,11 +337,22 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Theme.of(context).primaryColor),
             ),
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                      labelText: "Kategori Adı", border: OutlineInputBorder()),
+              Form(
+                key: formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    initialValue: category.categoryTitle,
+                    decoration: InputDecoration(
+                        labelText: "Kategori Adı",
+                        border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value.length < 3)
+                        return "Lütfen en az 3 karakter giriniz";
+                      return null;
+                    },
+                    onSaved: (value) => newCategoryTitle = value,
+                  ),
                 ),
               ),
               editColorWidget(context, category),
@@ -331,7 +365,9 @@ class _HomePageState extends State<HomePage> {
                       "Kaldır",
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _sureForDelCategory(context, category.id);
+                    },
                   ),
                   ElevatedButton(
                     style:
@@ -340,7 +376,9 @@ class _HomePageState extends State<HomePage> {
                       "İptal ❌",
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: Colors.green),
@@ -348,7 +386,25 @@ class _HomePageState extends State<HomePage> {
                       "Kaydet 💾",
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (formKey.currentState.validate()) {
+                        formKey.currentState.save();
+                        int value = await databaseHelper.updateCategory(
+                            Category.withID(
+                                category.id, newCategoryTitle, category.color));
+                        if (value > 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Kategori başarıyla düzenlendi 👌"),
+                            duration: Duration(seconds: 2),
+                          ));
+                          newCategoryTitle = null;
+                          Navigator.pop(context);
+                          setState(() {
+                            updateCategoryList();
+                          });
+                        }
+                      }
+                    },
                   )
                 ],
               )
@@ -408,25 +464,26 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  TextStyle switchCategoriesTitleStyle() {
-    switch (settings.currentColor.hashCode) {
-      //Siyah renk
-      case 4278190080:
-        return headerStyle4.copyWith(color: Colors.white);
-      default:
-        return headerStyle4;
-    }
-  }
-
-  Future<bool> _areYouSureforExit() async {
-    final sonuc = await PlatformDuyarliAlertDialog(
+  Future<void> _sureForDelCategory(BuildContext context, int categoryID) async {
+    final result = await PlatformDuyarliAlertDialog(
       baslik: "Emin misiniz?",
-      icerik: "Mr. Note Clone dan çıkmak istediğinize emin misiniz?",
-      anaButonYazisi: "ÇIK",
-      iptalButonYazisi: "İPTAL",
+      icerik: "Kategoriyi silmek istediğinizden emin misiniz?\n" +
+          "Bu işlem, bu kategorideki tüm notları silecek.",
+      anaButonYazisi: "Evet",
+      iptalButonYazisi: "Hayır",
     ).goster(context);
 
-    return Future.value(sonuc);
+    if (result) await _delCategory(context, categoryID);
+  }
+
+  Future<void> _delCategory(BuildContext context, int categoryID) async {
+    int deletedCategory = await databaseHelper.deleteCategory(categoryID);
+    if (deletedCategory != 0) {
+      setState(() {
+        updateCategoryList();
+      });
+      Navigator.pop(context);
+    }
   }
 }
 

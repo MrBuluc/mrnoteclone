@@ -78,4 +78,18 @@ class DatabaseHelper {
     int sonuc = await db.insert("category", category.toMap());
     return sonuc;
   }
+
+  Future<int> deleteCategory(int categoryID) async {
+    Database db = await _getDatabase();
+    int sonuc = await db
+        .delete("category", where: "categoryID = ?", whereArgs: [categoryID]);
+    return sonuc;
+  }
+
+  Future<int> updateCategory(Category category) async {
+    Database db = await _getDatabase();
+    int sonuc = await db.update("category", category.toMap(),
+        where: "categoryID = ?", whereArgs: [category.id]);
+    return sonuc;
+  }
 }
