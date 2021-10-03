@@ -12,4 +12,7 @@ class Note {
 
   Note.withID(this.id, this.categoryID, this.title, this.content, this.time,
       this.priority);
+
+  Note.all(this.id, this.categoryID, this.categoryTitle, this.categoryColor,
+      this.title, this.content, this.priority, this.time);
 }

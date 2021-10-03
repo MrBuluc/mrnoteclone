@@ -15,8 +15,20 @@ TextStyle headerStyle3 = TextStyle(
     fontWeight: FontWeight.bold,
     color: Colors.grey.shade800);
 
+TextStyle headerStyle3_2 = TextStyle(
+    fontFamily: "Aileron",
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    color: Colors.grey.shade700);
+
 TextStyle headerStyle4 =
     TextStyle(fontFamily: "Aileron", fontSize: 20, color: Colors.grey.shade700);
+
+TextStyle headerStyle5 = TextStyle(
+    fontFamily: "Aileron",
+    fontSize: 20,
+    color: Colors.black,
+    fontWeight: FontWeight.bold);
 
 TextStyle headerStyle11 = TextStyle(
     fontFamily: "Aileron",

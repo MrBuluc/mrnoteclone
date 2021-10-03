@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
+import 'package:mr_note_clone/common_widget/build_note_list.dart';
 import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/settings.dart';
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
             header(),
             categoriesAndNew(),
             buildCategories(size),
-            // Notes()
+            Notes()
           ],
         ),
       )),
@@ -487,4 +488,81 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class Notes {}
+class Notes extends StatefulWidget {
+  const Notes({Key key}) : super(key: key);
+
+  @override
+  _NotesState createState() => _NotesState();
+}
+
+class _NotesState extends State<Notes> {
+  int lenght = 1;
+
+  bool isSorted = false;
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
+    return Container(
+      child: Column(
+        children: [
+          buildRecentOnesAndFilterHeader(),
+          SizedBox(
+            height: 10,
+          ),
+          lenght == 0
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Text(
+                      "Tekrar hoşgeldin🥳\n" +
+                          "Bugün hiçbir not düzenlemedin 😉",
+                      style:
+                          TextStyle(fontSize: 20, color: Colors.grey.shade800),
+                    ),
+                  ),
+                )
+              : Container(
+                  height: 150.0 * lenght,
+                  width: size.width * 0.85,
+                  child: BuildNoteList(isSorted: isSorted),
+                )
+        ],
+      ),
+    );
+  }
+
+  Widget buildRecentOnesAndFilterHeader() {
+    return Container(
+      height: 60,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 30, top: 30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Son Mr. Notlar",
+              style: headerStyle2,
+            ),
+            Row(
+              children: [
+                Text(
+                  "+Yeni",
+                  style: headerStyle2,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                  child: Icon(Icons.sort),
+                  onTap: () {},
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}

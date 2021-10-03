@@ -92,4 +92,47 @@ class DatabaseHelper {
         where: "categoryID = ?", whereArgs: [category.id]);
     return sonuc;
   }
+
+  String dateFormat(DateTime dt) {
+    String month;
+    switch (dt.month) {
+      case 1:
+        month = "Ocak";
+        break;
+      case 2:
+        month = "Şubat";
+        break;
+      case 3:
+        month = "Mart";
+        break;
+      case 4:
+        month = "Nisan";
+        break;
+      case 5:
+        month = "Mayıs";
+        break;
+      case 6:
+        month = "Haziran";
+        break;
+      case 7:
+        month = "Temmuz";
+        break;
+      case 8:
+        month = "Ağustos";
+        break;
+      case 9:
+        month = "Eylül";
+        break;
+      case 10:
+        month = "Ekim";
+        break;
+      case 11:
+        month = "Kasım";
+        break;
+      case 12:
+        month = "Aralık";
+        break;
+    }
+    return month + " " + dt.day.toString() + ", " + dt.year.toString();
+  }
 }
