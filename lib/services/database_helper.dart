@@ -135,4 +135,11 @@ class DatabaseHelper {
     }
     return month + " " + dt.day.toString() + ", " + dt.year.toString();
   }
+
+  Future<int> isThereAnyTodayNotes(String suan) async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> sonuc =
+        await db.rawQuery("SELECT COUNT() FROM note WHERE time LIKE '$suan%';");
+    return sonuc[0]["COUNT()"];
+  }
 }

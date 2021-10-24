@@ -496,13 +496,22 @@ class Notes extends StatefulWidget {
 }
 
 class _NotesState extends State<Notes> {
-  int lenght = 1;
+  int lenght, sortBy, orderBy;
 
   bool isSorted = false;
+
+  DatabaseHelper databaseHelper = DatabaseHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    readSort();
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    todayNotesLenght();
 
     return Container(
       child: Column(
@@ -531,6 +540,29 @@ class _NotesState extends State<Notes> {
         ],
       ),
     );
+  }
+
+  void readSort() {
+    Settings settings = Settings();
+    //3/1
+    String sort = settings.sort;
+    //["3", "1"]
+    List<String> sortList = sort.split("/");
+    setState(() {
+      //sortBy = 3
+      sortBy = int.parse(sortList[0]);
+      //orderBy = 1
+      orderBy = int.parse(sortList[1]);
+    });
+  }
+
+  Future<void> todayNotesLenght() async {
+    //Şuan: 2021-10-24 12:23:47.843435
+    String suan = DateTime.now().toString().substring(0, 10);
+    int lenghtLocal = await databaseHelper.isThereAnyTodayNotes(suan);
+    setState(() {
+      lenght = lenghtLocal;
+    });
   }
 
   Widget buildRecentOnesAndFilterHeader() {
