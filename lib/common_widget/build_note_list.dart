@@ -14,7 +14,10 @@ class BuildNoteList extends StatefulWidget {
 }
 
 class _BuildNoteListState extends State<BuildNoteList> {
-  List<Note> allNotes = [];
+  List<Note> allNotes = [
+    Note.all(1, 1, "Genel", Colors.red.value, "Başlık", "İçerik", 2,
+        DateTime.now().toString())
+  ];
 
   Settings settings = Settings();
 

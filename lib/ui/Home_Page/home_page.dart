@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
 import 'package:mr_note_clone/common_widget/build_note_list.dart';
+import 'package:mr_note_clone/common_widget/merkez_widget.dart';
 import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/settings.dart';
@@ -498,7 +499,7 @@ class Notes extends StatefulWidget {
 class _NotesState extends State<Notes> {
   int lenght, sortBy, orderBy;
 
-  bool isSorted = false;
+  bool isSorted = false, readed = false;
 
   DatabaseHelper databaseHelper = DatabaseHelper();
 
@@ -511,7 +512,6 @@ class _NotesState extends State<Notes> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    todayNotesLenght();
 
     return Container(
       child: Column(
@@ -520,23 +520,29 @@ class _NotesState extends State<Notes> {
           SizedBox(
             height: 10,
           ),
-          lenght == 0
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Text(
-                      "Tekrar hoşgeldin🥳\n" +
-                          "Bugün hiçbir not düzenlemedin 😉",
-                      style:
-                          TextStyle(fontSize: 20, color: Colors.grey.shade800),
+          FutureBuilder(
+              future: todayNotesLenght(),
+              builder: (context, _) {
+                if (!readed)
+                  return MerkezWidget(children: [CircularProgressIndicator()]);
+                if (lenght == 0)
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Text(
+                        "Tekrar hoşgeldin🥳\n" +
+                            "Bugün hiçbir not düzenlemedin 😉",
+                        style: TextStyle(
+                            fontSize: 20, color: Colors.grey.shade800),
+                      ),
                     ),
-                  ),
-                )
-              : Container(
+                  );
+                return Container(
                   height: 150.0 * lenght,
                   width: size.width * 0.85,
                   child: BuildNoteList(isSorted: isSorted),
-                )
+                );
+              })
         ],
       ),
     );
@@ -562,6 +568,7 @@ class _NotesState extends State<Notes> {
     int lenghtLocal = await databaseHelper.isThereAnyTodayNotes(suan);
     setState(() {
       lenght = lenghtLocal;
+      readed = true;
     });
   }
 
@@ -588,7 +595,9 @@ class _NotesState extends State<Notes> {
                 ),
                 GestureDetector(
                   child: Icon(Icons.sort),
-                  onTap: () {},
+                  onTap: () {
+                    sortNotesDialog(context);
+                  },
                 )
               ],
             )
@@ -596,5 +605,88 @@ class _NotesState extends State<Notes> {
         ),
       ),
     );
+  }
+
+  void sortNotesDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text(
+              "Mr. Note Clone u Sırala",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            contentPadding: const EdgeInsets.only(left: 25),
+            children: [
+              dropDown(),
+              dropDownOrder(),
+            ],
+          );
+        });
+  }
+
+  Widget dropDown() {
+    List<String> sortList = [
+      "Kategori",
+      "Başlık",
+      "İçerik",
+      "Zaman",
+      "Öncelik"
+    ];
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter dropDownState) {
+        return DropdownButton(
+          value: sortBy,
+          icon: Icon(Icons.keyboard_arrow_down),
+          iconSize: 20,
+          style: TextStyle(color: Colors.deepPurple),
+          underline: Container(
+            height: 2,
+            color: Colors.transparent,
+          ),
+          onChanged: (selectedSortBy) =>
+              dropDownState(() => sortBy = selectedSortBy),
+          items: sortList
+              .map((e) => DropdownMenuItem<int>(
+                    child: Text(
+                      e,
+                      style: headerStyle3_1,
+                    ),
+                    value: sortList.indexOf(e),
+                  ))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  Widget dropDownOrder() {
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter dropDownOrderState) =>
+            DropdownButton<int>(
+              value: orderBy,
+              icon: Icon(Icons.keyboard_arrow_down),
+              iconSize: 20,
+              style: TextStyle(color: Colors.deepPurple),
+              underline: Container(
+                color: Colors.transparent,
+              ),
+              onChanged: (selectedOrderBy) =>
+                  dropDownOrderState(() => orderBy = selectedOrderBy),
+              items: createOrderByItem(),
+            ));
+  }
+
+  List<DropdownMenuItem<int>> createOrderByItem() {
+    List<String> orderList = ["Artan", "Azalan"];
+    return orderList
+        .map((order) => DropdownMenuItem<int>(
+              value: orderList.indexOf(order),
+              child: Text(
+                order,
+                style: headerStyle3,
+              ),
+            ))
+        .toList();
   }
 }
