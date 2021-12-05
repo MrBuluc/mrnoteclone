@@ -8,6 +8,7 @@ import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
+import 'package:mr_note_clone/ui/Note_Detail/note_detail.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -587,9 +588,13 @@ class _NotesState extends State<Notes> {
             ),
             Row(
               children: [
-                Text(
-                  "+Yeni",
-                  style: headerStyle2,
+                GestureDetector(
+                  child: Text(
+                    "+Yeni",
+                    style: headerStyle2,
+                  ),
+                  onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => NoteDetail())),
                 ),
                 SizedBox(
                   width: 10,
