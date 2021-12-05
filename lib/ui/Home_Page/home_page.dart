@@ -503,6 +503,8 @@ class _NotesState extends State<Notes> {
 
   DatabaseHelper databaseHelper = DatabaseHelper();
 
+  Settings settings = Settings();
+
   @override
   void initState() {
     super.initState();
@@ -549,7 +551,6 @@ class _NotesState extends State<Notes> {
   }
 
   void readSort() {
-    Settings settings = Settings();
     //3/1
     String sort = settings.sort;
     //["3", "1"]
@@ -620,6 +621,48 @@ class _NotesState extends State<Notes> {
             children: [
               dropDown(),
               dropDownOrder(),
+              ButtonBar(
+                children: [
+                  ElevatedButton(
+                    child: Text(
+                      "İptal",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style:
+                        ElevatedButton.styleFrom(primary: Colors.orangeAccent),
+                    onPressed: () {
+                      setState(() {
+                        isSorted = false;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: Text(
+                      "Sırala",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+                    onPressed: () async {
+                      String sort =
+                          sortBy.toString() + "/" + orderBy.toString();
+                      int result = await databaseHelper.updateSort(sort);
+                      if (result == 1) {
+                        settings.sort = sort;
+                        setState(() {
+                          isSorted = true;
+                        });
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Sıralama Db e kaydedilemedi :("),
+                          duration: Duration(seconds: 2),
+                        ));
+                      }
+                    },
+                  )
+                ],
+              )
             ],
           );
         });

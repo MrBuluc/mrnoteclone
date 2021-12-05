@@ -142,4 +142,10 @@ class DatabaseHelper {
         await db.rawQuery("SELECT COUNT() FROM note WHERE time LIKE '$suan%';");
     return sonuc[0]["COUNT()"];
   }
+
+  Future<int> updateSort(String sort) async {
+    Database db = await _getDatabase();
+    //"Update settings Set sort = $sort"
+    return await db.rawUpdate("update settings Set sort = ?", [sort]);
+  }
 }
