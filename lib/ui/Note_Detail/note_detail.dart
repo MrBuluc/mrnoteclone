@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
 import 'package:mr_note_clone/common_widget/merkez_widget.dart';
+import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/note.dart';
 import 'package:mr_note_clone/models/settings.dart';
@@ -22,7 +23,7 @@ class _NoteDetailState extends State<NoteDetail> {
 
   Note updateNote;
 
-  int categoryID, selectedPriority;
+  int categoryID, selectedPriority, counter = 0;
 
   Color backgroundColor;
 
@@ -30,8 +31,13 @@ class _NoteDetailState extends State<NoteDetail> {
 
   bool isChanged = false, readed = false;
 
+  GlobalKey formKey = GlobalKey<FormState>();
+
+  Size size;
+
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     return WillPopScope(
       onWillPop: () async {
         if (isChanged) {
@@ -83,7 +89,16 @@ class _NoteDetailState extends State<NoteDetail> {
                       ),
                     );
                   }
-                  return Container();
+                  return SingleChildScrollView(
+                    child: Container(
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          children: [buildAppBar()],
+                        ),
+                      ),
+                    ),
+                  );
                 }
               },
             ),
@@ -94,19 +109,110 @@ class _NoteDetailState extends State<NoteDetail> {
   }
 
   Future readCategories() async {
-    allCategories = await databaseHelper.getCategoryList();
-    if (allCategories.isNotEmpty) {
-      if (widget.updateNote != null) {
-        updateNote = widget.updateNote;
-        categoryID = updateNote.categoryID;
-        selectedPriority = updateNote.priority;
-        backgroundColor = Color(updateNote.categoryColor);
-      } else {
-        backgroundColor = settings.currentColor;
-        categoryID = allCategories[0].id;
-        selectedPriority = 0;
+    if (counter == 0) {
+      allCategories = await databaseHelper.getCategoryList();
+      if (allCategories.isNotEmpty) {
+        if (widget.updateNote != null) {
+          updateNote = widget.updateNote;
+          categoryID = updateNote.categoryID;
+          selectedPriority = updateNote.priority;
+          backgroundColor = Color(updateNote.categoryColor);
+        } else {
+          backgroundColor = settings.currentColor;
+          categoryID = allCategories[0].id;
+          selectedPriority = 0;
+        }
       }
+      readed = true;
+      counter++;
     }
-    readed = true;
+  }
+
+  Widget buildAppBar() {
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Icon(
+                Icons.close,
+                size: 40,
+                color: Colors.grey.shade400,
+              ),
+            ),
+            SizedBox(
+              width: size.width * 0.25,
+            ),
+            dropDown(),
+            SizedBox(
+              width: size.width * 0.05,
+            ),
+            dropDownPriorty()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget dropDown() {
+    return DropdownButton(
+      value: categoryID,
+      icon: Icon(Icons.keyboard_arrow_down),
+      iconSize: 20,
+      style: TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.transparent,
+      ),
+      onChanged: (selectedCategoryID) {
+        isChanged = true;
+        setState(() {
+          categoryID = selectedCategoryID;
+        });
+      },
+      items: createCategoryItem(),
+    );
+  }
+
+  List<DropdownMenuItem<int>> createCategoryItem() {
+    return allCategories
+        .map((category) => DropdownMenuItem<int>(
+              value: category.id,
+              child: Text(
+                category.categoryTitle,
+                style: headerStyle3,
+              ),
+            ))
+        .toList();
+  }
+
+  Widget dropDownPriorty() {
+    List<String> priority = ["Düşük", "Orta", "Yüksek"];
+    return DropdownButton<int>(
+      value: selectedPriority,
+      icon: Icon(Icons.keyboard_arrow_down),
+      iconSize: 20,
+      style: TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        color: Colors.transparent,
+      ),
+      onChanged: (selectedPriorityID) {
+        isChanged = true;
+        setState(() {
+          selectedPriority = selectedPriorityID;
+        });
+      },
+      items: priority
+          .map((e) => DropdownMenuItem<int>(
+                child: Text(
+                  e,
+                  style: headerStyle3_1,
+                ),
+                value: priority.indexOf(e),
+              ))
+          .toList(),
+    );
   }
 }
