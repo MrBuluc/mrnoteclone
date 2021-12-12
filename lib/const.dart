@@ -36,6 +36,12 @@ TextStyle headerStyle5 = TextStyle(
     color: Colors.black,
     fontWeight: FontWeight.bold);
 
+TextStyle headerStyle10 = TextStyle(
+    fontFamily: "Aileron",
+    fontSize: 18,
+    color: Colors.grey.shade800,
+    fontWeight: FontWeight.bold);
+
 TextStyle headerStyle11 = TextStyle(
     fontFamily: "Aileron",
     fontSize: 18,

@@ -35,6 +35,8 @@ class _NoteDetailState extends State<NoteDetail> {
 
   Size size;
 
+  String noteTitle, noteContent;
+
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
@@ -94,7 +96,11 @@ class _NoteDetailState extends State<NoteDetail> {
                       child: Form(
                         key: formKey,
                         child: Column(
-                          children: [buildAppBar()],
+                          children: [
+                            buildAppBar(),
+                            buildTitleFormField(),
+                            buildFormField()
+                          ],
                         ),
                       ),
                     ),
@@ -130,6 +136,9 @@ class _NoteDetailState extends State<NoteDetail> {
 
   Widget buildAppBar() {
     return Container(
+      height: 50,
+      width: size.width,
+      color: Colors.grey.shade100,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -149,7 +158,7 @@ class _NoteDetailState extends State<NoteDetail> {
             SizedBox(
               width: size.width * 0.05,
             ),
-            dropDownPriorty()
+            dropDownPriority()
           ],
         ),
       ),
@@ -188,7 +197,7 @@ class _NoteDetailState extends State<NoteDetail> {
         .toList();
   }
 
-  Widget dropDownPriorty() {
+  Widget dropDownPriority() {
     List<String> priority = ["Düşük", "Orta", "Yüksek"];
     return DropdownButton<int>(
       value: selectedPriority,
@@ -213,6 +222,54 @@ class _NoteDetailState extends State<NoteDetail> {
                 value: priority.indexOf(e),
               ))
           .toList(),
+    );
+  }
+
+  Widget buildTitleFormField() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 5),
+      child: TextFormField(
+        initialValue: updateNote != null ? updateNote.title : "",
+        maxLines: null,
+        style: headerStyle5,
+        cursorColor: Colors.grey.shade600,
+        decoration: InputDecoration(
+            hintText: "Mr. Note Clone Başlığını Girin",
+            hintStyle: headerStyle5,
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none),
+        onSaved: (text) => noteTitle = text,
+        onChanged: (String value) => isChanged = true,
+      ),
+    );
+  }
+
+  Widget buildFormField() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20),
+      child: Column(
+        children: [
+          TextFormField(
+            initialValue: updateNote != null ? updateNote.content : "",
+            maxLines: null,
+            style: headerStyle10,
+            cursorColor: Colors.grey.shade800,
+            decoration: InputDecoration(
+                hintText: "Mr. Note Clone İçeriğini Giriniz",
+                hintStyle: headerStyle10,
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none),
+            onSaved: (String text) => noteContent = text,
+            onChanged: (value) => isChanged = true,
+          ),
+        ],
+      ),
     );
   }
 }
