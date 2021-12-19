@@ -31,11 +31,19 @@ class _NoteDetailState extends State<NoteDetail> {
 
   bool isChanged = false, readed = false;
 
-  GlobalKey formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Size size;
 
   String noteTitle, noteContent;
+
+  PlatformDuyarliAlertDialog exitDialog = PlatformDuyarliAlertDialog(
+    baslik: "Emin misiniz?",
+    icerik: "Değişikliklerinizi kaydetmek mi yoksa iptal etmek mi "
+        "istiyorsunuz?",
+    anaButonYazisi: "KAYDET",
+    iptalButonYazisi: "İPTAL",
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -43,16 +51,10 @@ class _NoteDetailState extends State<NoteDetail> {
     return WillPopScope(
       onWillPop: () async {
         if (isChanged) {
-          final sonuc = await PlatformDuyarliAlertDialog(
-            baslik: "Emin misiniz?",
-            icerik: "Değişikliklerinizi kaydetmek mi yoksa iptal etmek mi "
-                "istiyorsunuz?",
-            anaButonYazisi: "KAYDET",
-            iptalButonYazisi: "İPTAL",
-          ).goster(context);
+          final sonuc = await exitDialog.goster(context);
 
           if (sonuc) {
-            //save(context);
+            save(context);
             return false;
           }
         }
@@ -72,7 +74,9 @@ class _NoteDetailState extends State<NoteDetail> {
                     Icons.save,
                     color: Colors.grey.shade700,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    save(context);
+                  },
                 ),
               ),
             ),
@@ -145,10 +149,17 @@ class _NoteDetailState extends State<NoteDetail> {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 8),
-              child: Icon(
-                Icons.close,
-                size: 40,
+              child: IconButton(
+                icon: Icon(Icons.close),
+                iconSize: 40,
                 color: Colors.grey.shade400,
+                onPressed: () async {
+                  if (isChanged) {
+                    final sonuc = await exitDialog.goster(context);
+                    if (sonuc) save(context);
+                  }
+                  Navigator.pop(context);
+                },
               ),
             ),
             SizedBox(
@@ -271,5 +282,29 @@ class _NoteDetailState extends State<NoteDetail> {
         ],
       ),
     );
+  }
+
+  Future save(BuildContext context) async {
+    formKey.currentState.save();
+    DateTime suan = DateTime.now();
+    int result;
+    String returnStr;
+    if (updateNote == null) {
+      result = await databaseHelper.addNote(Note(categoryID, noteTitle,
+          noteContent, suan.toString(), selectedPriority));
+      if (result != 0) returnStr = "saved";
+    } else {
+      result = await databaseHelper.updateNote(Note.withID(
+          updateNote.id,
+          categoryID,
+          noteTitle,
+          noteContent,
+          suan.toString(),
+          selectedPriority));
+      if (result != 0) returnStr = "updated";
+    }
+    if (result != 0) {
+      Navigator.pop(context, returnStr);
+    }
   }
 }

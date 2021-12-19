@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:mr_note_clone/models/category.dart';
+import 'package:mr_note_clone/models/note.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -147,5 +148,17 @@ class DatabaseHelper {
     Database db = await _getDatabase();
     //"Update settings Set sort = $sort"
     return await db.rawUpdate("update settings Set sort = ?", [sort]);
+  }
+
+  Future<int> addNote(Note note) async {
+    Database db = await _getDatabase();
+    return await db.insert("note", note.toMap());
+  }
+
+  Future updateNote(Note note) async {
+    Database db = await _getDatabase();
+    //Update note Set values Where id = note.id
+    return await db
+        .update("note", note.toMap(), where: "id = ?", whereArgs: [note.id]);
   }
 }

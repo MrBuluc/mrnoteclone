@@ -15,4 +15,13 @@ class Note {
 
   Note.all(this.id, this.categoryID, this.categoryTitle, this.categoryColor,
       this.title, this.content, this.priority, this.time);
+
+  Map<String, dynamic> toMap() => {
+        "id": id,
+        "categoryID": categoryID,
+        "noteTitle": title,
+        "content": content,
+        "time": time,
+        "priority": priority
+      };
 }
