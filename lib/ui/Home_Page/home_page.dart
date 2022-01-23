@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -588,13 +589,21 @@ class _NotesState extends State<Notes> {
             ),
             Row(
               children: [
-                GestureDetector(
-                  child: Text(
+                OpenContainer(
+                  onClosed: (result) {
+                    if (result != null) setState(() {});
+                  },
+                  transitionType: ContainerTransitionType.fade,
+                  openBuilder: (BuildContext context, VoidCallback _) =>
+                      NoteDetail(),
+                  closedElevation: 6,
+                  closedColor: settings.currentColor,
+                  closedBuilder:
+                      (BuildContext context, VoidCallback openContainer) =>
+                          Text(
                     "+Yeni",
                     style: headerStyle2,
                   ),
-                  onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => NoteDetail())),
                 ),
                 SizedBox(
                   width: 10,

@@ -157,8 +157,8 @@ class _NoteDetailState extends State<NoteDetail> {
                   if (isChanged) {
                     final sonuc = await exitDialog.goster(context);
                     if (sonuc) save(context);
-                  }
-                  Navigator.pop(context);
+                  } else
+                    Navigator.pop(context);
                 },
               ),
             ),
