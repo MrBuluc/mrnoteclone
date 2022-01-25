@@ -14,103 +14,123 @@ class BuildNoteList extends StatefulWidget {
 }
 
 class _BuildNoteListState extends State<BuildNoteList> {
-  List<Note> allNotes = [
-    Note.all(1, 1, "Genel", Colors.red.value, "Başlık", "İçerik", 2,
-        DateTime.now().toString())
-  ];
+  List<Note> allNotes = [];
 
   Settings settings = Settings();
 
   DatabaseHelper databaseHelper = DatabaseHelper();
 
+  bool isSorted;
+
+  @override
+  void initState() {
+    super.initState();
+    isSorted = widget.isSorted;
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: allNotes.length,
-      itemBuilder: (context, index) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            GestureDetector(
-              child: Container(
-                height: 130,
-                width: size.width,
-                decoration: BoxDecoration(
-                    color: settings.switchBackgroundColor(),
-                    borderRadius: borderRadius1),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Container(
-                      height: 110,
-                      width: size.width * 0.7,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+    return FutureBuilder(
+      future: fillAllNotes(),
+      builder: (context, _) {
+        return ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: allNotes.length,
+          itemBuilder: (context, index) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  child: Container(
+                    height: 130,
+                    width: size.width,
+                    decoration: BoxDecoration(
+                        color: settings.switchBackgroundColor(),
+                        borderRadius: borderRadius1),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Container(
+                          height: 110,
+                          width: size.width * 0.7,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                allNotes[index].title.length > 10
-                                    ? allNotes[index].title.substring(0, 10) +
-                                        "..."
-                                    : allNotes[index].title,
-                                style: headerStyle5,
+                              Row(
+                                children: [
+                                  Text(
+                                    allNotes[index].title.length > 10
+                                        ? allNotes[index]
+                                                .title
+                                                .substring(0, 10) +
+                                            "..."
+                                        : allNotes[index].title,
+                                    style: headerStyle5,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    databaseHelper.dateFormat(
+                                        DateTime.parse(allNotes[index].time)),
+                                    style: headerStyle3_2,
+                                  )
+                                ],
                               ),
                               SizedBox(
-                                width: 10,
+                                height: 3,
                               ),
                               Text(
-                                databaseHelper.dateFormat(
-                                    DateTime.parse(allNotes[index].time)),
-                                style: headerStyle3_2,
+                                allNotes[index].content.length > 50
+                                    ? allNotes[index]
+                                            .content
+                                            .replaceAll("\n", " ")
+                                            .substring(0, 50) +
+                                        "..."
+                                    : allNotes[index].content,
+                                style: headerStyle4,
                               )
                             ],
                           ),
-                          SizedBox(
-                            height: 3,
-                          ),
-                          Text(
-                            allNotes[index].content.length > 50
-                                ? allNotes[index]
-                                        .content
-                                        .replaceAll("\n", " ")
-                                        .substring(0, 50) +
-                                    "..."
-                                : allNotes[index].content,
-                            style: headerStyle4,
-                          )
-                        ],
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _setPriorityIcon(allNotes[index].priority),
-                        Container(
-                          height: 15,
-                          width: 15,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(allNotes[index].categoryColor)),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _setPriorityIcon(allNotes[index].priority),
+                            Container(
+                              height: 15,
+                              width: 15,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(allNotes[index].categoryColor)),
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
+                    ),
+                  ),
+                  onTap: () {},
                 ),
-              ),
-              onTap: () {},
-            ),
-            SizedBox(
-              height: 20,
-            )
-          ],
+                SizedBox(
+                  height: 20,
+                )
+              ],
+            );
+          },
         );
       },
     );
+  }
+
+  Future fillAllNotes() async {
+    //List<Note> allNotes1;
+    if (isSorted != null) {
+      String suan = DateTime.now().toString().substring(0, 10);
+      allNotes = await databaseHelper.getSortNoteList(suan);
+    }
   }
 
   _setPriorityIcon(int priority) {

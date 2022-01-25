@@ -161,4 +161,42 @@ class DatabaseHelper {
     return await db
         .update("note", note.toMap(), where: "id = ?", whereArgs: [note.id]);
   }
+
+  Future<List<Note>> getSortNoteList(String suan) async {
+    Database db = await _getDatabase();
+    List<String> sortList = (await getSettings()).sort.split("/");
+    int sortBy = int.parse(sortList[0]);
+    int orderBy = int.parse(sortList[1]);
+    String query =
+        "Select * From note Inner Join category on category.categoryID = "
+        "note.categoryID Where time Like '$suan%' order by ";
+    switch (sortBy) {
+      case 0:
+        query += "categoryTitle";
+        break;
+      case 1:
+        query += "noteTitle";
+        break;
+      case 2:
+        query += "content";
+        break;
+      case 3:
+        query += "time";
+        break;
+      case 4:
+        query += "priority";
+        break;
+    }
+    if (orderBy == 0) {
+      query += " ASC;";
+    } else {
+      query += " DESC;";
+    }
+    List<Map<String, dynamic>> noteMapList = await db.rawQuery(query);
+    List<Note> noteList = [];
+    for (Map map in noteMapList) {
+      noteList.add(Note.fromMap(map));
+    }
+    return noteList;
+  }
 }
