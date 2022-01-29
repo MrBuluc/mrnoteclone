@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
 import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/note.dart';
 import 'package:mr_note_clone/models/settings.dart';
@@ -43,76 +44,87 @@ class _BuildNoteListState extends State<BuildNoteList> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                GestureDetector(
-                  child: Container(
-                    height: 130,
-                    width: size.width,
-                    decoration: BoxDecoration(
-                        color: settings.switchBackgroundColor(),
-                        borderRadius: borderRadius1),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Container(
-                          height: 110,
-                          width: size.width * 0.7,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                Dismissible(
+                  key: Key(allNotes[index].id.toString()),
+                  onDismissed: (direction) {
+                    int noteID = allNotes[index].id;
+                    setState(() {
+                      allNotes.removeAt(index);
+                    });
+                    _areYouSureforDelete(noteID);
+                  },
+                  child: GestureDetector(
+                    child: Container(
+                      height: 130,
+                      width: size.width,
+                      decoration: BoxDecoration(
+                          color: settings.switchBackgroundColor(),
+                          borderRadius: borderRadius1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            height: 110,
+                            width: size.width * 0.7,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      allNotes[index].title.length > 10
+                                          ? allNotes[index]
+                                                  .title
+                                                  .substring(0, 10) +
+                                              "..."
+                                          : allNotes[index].title,
+                                      style: headerStyle5,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      databaseHelper.dateFormat(
+                                          DateTime.parse(allNotes[index].time)),
+                                      style: headerStyle3_2,
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 3,
+                                ),
+                                Text(
+                                  allNotes[index].content.length > 50
+                                      ? allNotes[index]
+                                              .content
+                                              .replaceAll("\n", " ")
+                                              .substring(0, 50) +
+                                          "..."
+                                      : allNotes[index].content,
+                                  style: headerStyle4,
+                                )
+                              ],
+                            ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    allNotes[index].title.length > 10
-                                        ? allNotes[index]
-                                                .title
-                                                .substring(0, 10) +
-                                            "..."
-                                        : allNotes[index].title,
-                                    style: headerStyle5,
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    databaseHelper.dateFormat(
-                                        DateTime.parse(allNotes[index].time)),
-                                    style: headerStyle3_2,
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Text(
-                                allNotes[index].content.length > 50
-                                    ? allNotes[index]
-                                            .content
-                                            .replaceAll("\n", " ")
-                                            .substring(0, 50) +
-                                        "..."
-                                    : allNotes[index].content,
-                                style: headerStyle4,
+                              _setPriorityIcon(allNotes[index].priority),
+                              Container(
+                                height: 15,
+                                width: 15,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        Color(allNotes[index].categoryColor)),
                               )
                             ],
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _setPriorityIcon(allNotes[index].priority),
-                            Container(
-                              height: 15,
-                              width: 15,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(allNotes[index].categoryColor)),
-                            )
-                          ],
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
+                    onTap: () {},
                   ),
-                  onTap: () {},
                 ),
                 SizedBox(
                   height: 20,
@@ -162,6 +174,26 @@ class _BuildNoteListState extends State<BuildNoteList> {
           backgroundColor: Color(0xFFff0000),
         );
         break;
+    }
+  }
+
+  Future _areYouSureforDelete(int noteID) async {
+    bool sonuc = await PlatformDuyarliAlertDialog(
+            baslik: "Emin misiniz?",
+            icerik: "1 not silinecek",
+            anaButonYazisi: "SİL",
+            iptalButonYazisi: "İPTAL")
+        .goster(context);
+
+    if (sonuc) _delNote(noteID);
+  }
+
+  Future _delNote(int noteID) async {
+    int sonuc = await databaseHelper.deleteNote(noteID);
+    if (sonuc != 0) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("1 Not Silindi")));
+      setState(() {});
     }
   }
 }
