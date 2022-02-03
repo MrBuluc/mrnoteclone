@@ -10,6 +10,7 @@ import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
 import 'package:mr_note_clone/ui/Note_Detail/note_detail.dart';
+import 'package:mr_note_clone/ui/Search_Page/search_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -91,8 +92,8 @@ class _HomePageState extends State<HomePage> {
               style: headerStyle3,
             ),
             onPressed: () {
-              // Navigator.of(context)
-              //     .push(MaterialPageRoute(builder: (context) => SearchPage()));
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => SearchPage()));
             },
           ),
           GestureDetector(

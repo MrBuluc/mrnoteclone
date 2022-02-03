@@ -1,76 +1,51 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
-import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/note.dart';
 import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
-import 'package:mr_note_clone/ui/Note_Detail/note_detail.dart';
 
-class BuildNoteList extends StatefulWidget {
-  final bool isSorted;
+import '../../const.dart';
 
-  BuildNoteList({this.isSorted});
-
+class SearchPage extends StatefulWidget {
   @override
-  _BuildNoteListState createState() => _BuildNoteListState();
+  _SearchPageState createState() => _SearchPageState();
 }
 
-class _BuildNoteListState extends State<BuildNoteList> {
-  List<Note> allNotes = [];
-
+class _SearchPageState extends State<SearchPage> {
   Settings settings = Settings();
 
+  List<Note> allNotes = [];
+
   DatabaseHelper databaseHelper = DatabaseHelper();
-
-  bool isSorted;
-
-  @override
-  void initState() {
-    super.initState();
-    isSorted = widget.isSorted;
-  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
-    return FutureBuilder(
-      future: fillAllNotes(),
-      builder: (context, _) {
-        return ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: allNotes.length,
-          itemBuilder: (context, index) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Dismissible(
-                  key: Key(allNotes[index].id.toString()),
-                  onDismissed: (direction) {
-                    int noteID = allNotes[index].id;
-                    setState(() {
-                      allNotes.removeAt(index);
-                    });
-                    _areYouSureforDelete(noteID);
-                  },
-                  background: Container(
-                    color: Colors.red,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 50, left: 100),
-                      child: Text(
-                        "Kaldır",
-                        style: TextStyle(fontSize: 30),
-                      ),
-                    ),
-                  ),
-                  child: GestureDetector(
+    return Scaffold(
+      backgroundColor: settings.currentColor,
+      appBar: AppBar(
+        title: TextField(
+          decoration: InputDecoration(hintText: "Ara"),
+          autofocus: true,
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          height: 150.0 * allNotes.length,
+          child: ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: allNotes.length,
+            itemBuilder: (context, index) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  GestureDetector(
                     child: Container(
                       height: 130,
                       width: size.width,
                       decoration: BoxDecoration(
-                          color: settings.switchBackgroundColor(),
-                          borderRadius: borderRadius1),
+                          color: Colors.white, borderRadius: borderRadius1),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -86,7 +61,7 @@ class _BuildNoteListState extends State<BuildNoteList> {
                                       allNotes[index].title.length > 10
                                           ? allNotes[index]
                                                   .title
-                                                  .substring(0, 10) +
+                                                  .substring(0, 11) +
                                               "..."
                                           : allNotes[index].title,
                                       style: headerStyle5,
@@ -105,10 +80,9 @@ class _BuildNoteListState extends State<BuildNoteList> {
                                   height: 3,
                                 ),
                                 Text(
-                                  allNotes[index].content.length > 50
+                                  allNotes[index].content.length >= 50
                                       ? allNotes[index]
                                               .content
-                                              .replaceAll("\n", " ")
                                               .substring(0, 50) +
                                           "..."
                                       : allNotes[index].content,
@@ -134,33 +108,18 @@ class _BuildNoteListState extends State<BuildNoteList> {
                         ],
                       ),
                     ),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NoteDetail(
-                                    updateNote: allNotes[index],
-                                  )));
-                    },
+                    onTap: () {},
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                )
-              ],
-            );
-          },
-        );
-      },
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              );
+            },
+          ),
+        ),
+      ),
     );
-  }
-
-  Future fillAllNotes() async {
-    //List<Note> allNotes1;
-    if (isSorted != null) {
-      String suan = DateTime.now().toString().substring(0, 10);
-      allNotes = await databaseHelper.getSortNoteList(suan);
-    }
   }
 
   _setPriorityIcon(int priority) {
@@ -192,26 +151,6 @@ class _BuildNoteListState extends State<BuildNoteList> {
           backgroundColor: Color(0xFFff0000),
         );
         break;
-    }
-  }
-
-  Future _areYouSureforDelete(int noteID) async {
-    bool sonuc = await PlatformDuyarliAlertDialog(
-            baslik: "Emin misiniz?",
-            icerik: "1 not silinecek",
-            anaButonYazisi: "SİL",
-            iptalButonYazisi: "İPTAL")
-        .goster(context);
-
-    if (sonuc) _delNote(noteID);
-  }
-
-  Future _delNote(int noteID) async {
-    int sonuc = await databaseHelper.deleteNote(noteID);
-    if (sonuc != 0) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("1 Not Silindi")));
-      setState(() {});
     }
   }
 }
