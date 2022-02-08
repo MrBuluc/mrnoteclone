@@ -204,4 +204,29 @@ class DatabaseHelper {
     Database db = await _getDatabase();
     return await db.delete("note", where: "id = ?", whereArgs: [noteID]);
   }
+
+  Future<List<Note>> getNoteList() async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> noteMapList = await db.rawQuery(
+        "Select * From note Inner Join category on category.categoryID = "
+        "note.categoryID Order By id Asc;");
+    List<Note> noteList = [];
+    for (Map map in noteMapList) {
+      noteList.add(Note.fromMap(map));
+    }
+    return noteList;
+  }
+
+  Future<List<Note>> getSearchNoteList(String search) async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> noteMapList = await db.rawQuery(
+        "Select * From note Inner Join category on category.categoryID = "
+        "note.categoryID Where note.noteTitle Like '%$search%' Or note.content"
+        " Like '%$search%' Order By id Desc;");
+    List<Note> noteList = [];
+    for (Map map in noteMapList) {
+      noteList.add(Note.fromMap(map));
+    }
+    return noteList;
+  }
 }
