@@ -11,6 +11,7 @@ import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
 import 'package:mr_note_clone/ui/Note_Detail/note_detail.dart';
 import 'package:mr_note_clone/ui/Search_Page/search_page.dart';
+import 'package:mr_note_clone/ui/Settings/SettingsPage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -103,13 +104,12 @@ class _HomePageState extends State<HomePage> {
               size: 30,
             ),
             onTap: () async {
-              // String result = await Navigator.of(context).push(
-              //   MaterialPageRoute(builder: (context) => SettingsPage());
-              // );
-              // if (result != null)
-              //   updateCategoryList();
-              // else
-              //   setState(() {});
+              String result = await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SettingsPage()));
+              if (result != null)
+                updateCategoryList();
+              else
+                setState(() {});
             },
           )
         ],
