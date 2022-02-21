@@ -150,6 +150,13 @@ class DatabaseHelper {
     return await db.rawUpdate("update settings Set sort = ?", [sort]);
   }
 
+  Future<int> updatePassword(String newPassword) async {
+    Database db = await _getDatabase();
+    //"Update settings Set password = $newPassword"
+    return await db
+        .rawUpdate("Update settings Set password = ?", [newPassword]);
+  }
+
   Future<int> addNote(Note note) async {
     Database db = await _getDatabase();
     return await db.insert("note", note.toMap());

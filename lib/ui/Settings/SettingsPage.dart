@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:mr_note_clone/common_widget/Platform_Duyarli_Alert_Dialog/platform_duyarli_alert_dialog.dart';
 import 'package:mr_note_clone/models/settings.dart';
+import 'package:mr_note_clone/services/database_helper.dart';
 
 import '../../const.dart';
 
@@ -20,12 +22,21 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool show = false;
 
+  TextEditingController myController = TextEditingController();
+
+  DatabaseHelper databaseHelper = DatabaseHelper();
+
   @override
   void initState() {
     super.initState();
     currentColor = settings.currentColor;
-    passwordStr = settings.password;
     prepareShowPassword();
+  }
+
+  @override
+  void dispose() {
+    myController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,12 +63,14 @@ class _SettingsPageState extends State<SettingsPage> {
             height: 10,
           ),
           changePassword(),
+          saveButton(),
         ],
       ),
     ));
   }
 
   prepareShowPassword() {
+    passwordStr = settings.password;
     if (passwordStr != null)
       setState(() {
         //passwordStr = "1234"
@@ -228,6 +241,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
+              controller: myController,
               decoration: InputDecoration(
                   prefixIcon: Icon(
                     Icons.lock,
@@ -250,7 +264,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: headerStyle7,
               ),
               style: ElevatedButton.styleFrom(primary: Colors.grey.shade800),
-              onPressed: () {},
+              onPressed: () {
+                savePassword();
+              },
             ),
             ElevatedButton(
               child: Text(
@@ -264,5 +280,83 @@ class _SettingsPageState extends State<SettingsPage> {
         )
       ],
     );
+  }
+
+  Widget saveButton() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 60),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          GestureDetector(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3), color: Colors.black),
+              height: 50,
+              width: 50,
+              child: Icon(
+                Icons.refresh,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            onTap: () {},
+          ),
+          SizedBox(
+            width: 150,
+          ),
+          GestureDetector(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3), color: Colors.black),
+              height: 50,
+              width: 50,
+              child: Icon(
+                Icons.save,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            onTap: () {},
+          )
+        ],
+      ),
+    );
+  }
+
+  Future savePassword() async {
+    try {
+      String newPassword = myController.text;
+      if (newPassword == "") {
+        newPassword = null;
+        bool sonuc = await PlatformDuyarliAlertDialog(
+          baslik: "Parolayı Kaldırmak İstiyor Musunuz?",
+          icerik: "Bu işlemi onaylarsanız şifre kaldırılacaktır.",
+          anaButonYazisi: "Onayla",
+          iptalButonYazisi: "İptal",
+        ).goster(context);
+        if (sonuc) await databaseHelper.updatePassword(null);
+      } else
+        await databaseHelper.updatePassword(newPassword);
+
+      bool sonuc1 = await PlatformDuyarliAlertDialog(
+        baslik: "Başarılı Bir Şekilde Kaydedildi ✔",
+        icerik: "✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔",
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+      if (sonuc1) {
+        Navigator.pop(context);
+        setState(() {
+          settings.password = newPassword;
+          prepareShowPassword();
+        });
+      }
+    } catch (e) {
+      PlatformDuyarliAlertDialog(
+        baslik: "Kaydetme Başarısız Oldu ❌",
+        icerik: "Hata: " + e.toString(),
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+    }
   }
 }
