@@ -157,6 +157,12 @@ class DatabaseHelper {
         .rawUpdate("Update settings Set password = ?", [newPassword]);
   }
 
+  Future<int> updateTheme(String newTheme) async {
+    Database db = await _getDatabase();
+    //"Update settings Set theme = $newTheme";
+    return await db.rawUpdate("Update settings Set theme = ?", [newTheme]);
+  }
+
   Future<int> addNote(Note note) async {
     Database db = await _getDatabase();
     return await db.insert("note", note.toMap());

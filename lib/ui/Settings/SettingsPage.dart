@@ -274,7 +274,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: headerStyle4,
               ),
               style: ElevatedButton.styleFrom(primary: settings.currentColor),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
             )
           ],
         )
@@ -300,7 +302,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 size: 30,
               ),
             ),
-            onTap: () {},
+            onTap: () {
+              refreshTheme();
+            },
           ),
           SizedBox(
             width: 150,
@@ -317,7 +321,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 size: 30,
               ),
             ),
-            onTap: () {},
+            onTap: () {
+              save();
+            },
           )
         ],
       ),
@@ -354,6 +360,44 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (e) {
       PlatformDuyarliAlertDialog(
         baslik: "Kaydetme Başarısız Oldu ❌",
+        icerik: "Hata: " + e.toString(),
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+    }
+  }
+
+  Future refreshTheme() async {
+    try {
+      databaseHelper.updateTheme("4293914607");
+      settings.currentColor = Color(4293914607);
+      await PlatformDuyarliAlertDialog(
+        baslik: "Başarılı Bir Şekilde Varsayılan Temaya Dönüldü ✔",
+        icerik: "✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔",
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+      Navigator.pop(context, "refreshed");
+    } catch (e) {
+      PlatformDuyarliAlertDialog(
+        baslik: "Varsayılan Temaya Dönmek Başarısız Oldu ❌",
+        icerik: "Hata: " + e.toString(),
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+    }
+  }
+
+  Future save() async {
+    try {
+      settings.currentColor = currentColor;
+      databaseHelper.updateTheme(currentColor.value.toString());
+      await PlatformDuyarliAlertDialog(
+        baslik: "Başarılı Bir Şekilde Tema Kaydedildi ✔",
+        icerik: "✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔",
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+      Navigator.pop(context, "saved");
+    } catch (e) {
+      PlatformDuyarliAlertDialog(
+        baslik: "Temayı Kaydetme Başarısız Oldu ❌",
         icerik: "Hata: " + e.toString(),
         anaButonYazisi: "Tamam",
       ).goster(context);
