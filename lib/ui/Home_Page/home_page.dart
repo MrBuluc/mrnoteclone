@@ -9,6 +9,7 @@ import 'package:mr_note_clone/const.dart';
 import 'package:mr_note_clone/models/category.dart';
 import 'package:mr_note_clone/models/settings.dart';
 import 'package:mr_note_clone/services/database_helper.dart';
+import 'package:mr_note_clone/ui/Category_Page/category_page.dart';
 import 'package:mr_note_clone/ui/Note_Detail/note_detail.dart';
 import 'package:mr_note_clone/ui/Search_Page/search_page.dart';
 import 'package:mr_note_clone/ui/Settings/SettingsPage.dart';
@@ -304,9 +305,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             onTap: () {
-              // Navigator.of(context).push(MaterialPageRoute(
-              //     builder: (context) =>
-              //         CategoryPage(categoy: allCategories[index])));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      CategoryPage(category: allCategories[index])));
             },
             onLongPress: () {
               if (index != 0) {

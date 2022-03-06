@@ -56,4 +56,6 @@ TextStyle headerStyle11 = TextStyle(
 
 Color generalColor = Color.fromRGBO(176, 140, 249, 1);
 
+Color scaffoldColor = Color.fromRGBO(249, 239, 239, 1);
+
 BorderRadius borderRadius1 = BorderRadius.circular(5);
