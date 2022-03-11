@@ -242,4 +242,18 @@ class DatabaseHelper {
     }
     return noteList;
   }
+
+  Future<int> lenghtAllNotes() async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> sonuc =
+        await db.rawQuery("Select Count() From note;");
+    return sonuc[0]["Count()"];
+  }
+
+  Future<int> lenghtCategoryNotes(int categoryID) async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> sonuc = await db
+        .rawQuery("Select Count() From note Where categoryID == $categoryID;");
+    return sonuc[0]["Count()"];
+  }
 }

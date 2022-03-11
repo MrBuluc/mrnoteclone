@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mr_note_clone/common_widget/build_note_list.dart';
 import 'package:mr_note_clone/models/category.dart';
+import 'package:mr_note_clone/services/database_helper.dart';
 
 import '../../const.dart';
 
@@ -17,6 +19,8 @@ class _CategoryPageState extends State<CategoryPage> {
 
   int lenght = 0;
 
+  DatabaseHelper databaseHelper = DatabaseHelper();
+
   @override
   void initState() {
     super.initState();
@@ -26,25 +30,34 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    lenghtNotes();
     return SafeArea(
         child: Scaffold(
       backgroundColor: scaffoldColor,
-      body: Column(
-        children: [
-          buildHeader(size),
-          SizedBox(
-            height: 20,
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Text(
-                "Buralar soğuk gözüküyor 🥶\n" + "Hadi biraz ısıtalım 🥳",
-                style: TextStyle(fontSize: 20),
-              ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            buildHeader(size),
+            SizedBox(
+              height: 20,
             ),
-          )
-        ],
+            lenght == 0
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Text(
+                        "Buralar soğuk gözüküyor 🥶\n" +
+                            "Hadi biraz ısıtalım 🥳",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  )
+                : Container(
+                    height: 150.0 * lenght,
+                    child: BuildNoteList(),
+                  )
+          ],
+        ),
       ),
     ));
   }
@@ -88,5 +101,16 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
       ),
     );
+  }
+
+  Future lenghtNotes() async {
+    int lenghtLocal, categoryID = category.id;
+    if (categoryID == 0)
+      lenghtLocal = await databaseHelper.lenghtAllNotes();
+    else
+      lenghtLocal = await databaseHelper.lenghtCategoryNotes(categoryID);
+    setState(() {
+      lenght = lenghtLocal;
+    });
   }
 }
