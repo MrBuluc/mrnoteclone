@@ -41,8 +41,11 @@ class _CategoryPageState extends State<CategoryPage> {
             SizedBox(
               height: 20,
             ),
-            lenght == 0
-                ? Center(
+            FutureBuilder(
+              future: lenghtNotes(),
+              builder: (context, _) {
+                if (lenght == 0) {
+                  return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: Text(
@@ -51,11 +54,17 @@ class _CategoryPageState extends State<CategoryPage> {
                         style: TextStyle(fontSize: 20),
                       ),
                     ),
-                  )
-                : Container(
+                  );
+                } else {
+                  return Container(
                     height: 150.0 * lenght,
-                    child: BuildNoteList(),
-                  )
+                    child: BuildNoteList(
+                      categoryID: category.id,
+                    ),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -78,10 +87,15 @@ class _CategoryPageState extends State<CategoryPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.arrow_back_ios,
-                    size: 20,
-                    color: Colors.white,
+                  GestureDetector(
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   )
                 ],
               ),

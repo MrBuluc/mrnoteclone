@@ -230,6 +230,18 @@ class DatabaseHelper {
     return noteList;
   }
 
+  Future<List<Note>> getCategoryNotesList(int categoryID) async {
+    Database db = await _getDatabase();
+    List<Map<String, dynamic>> noteMapList = await db.rawQuery(
+        "Select * From note Inner Join category on category.categoryID = "
+        "note.categoryID Where note.categoryID = $categoryID Order by id Desc;");
+    List<Note> noteList = [];
+    for (Map map in noteMapList) {
+      noteList.add(Note.fromMap(map));
+    }
+    return noteList;
+  }
+
   Future<List<Note>> getSearchNoteList(String search) async {
     Database db = await _getDatabase();
     List<Map<String, dynamic>> noteMapList = await db.rawQuery(

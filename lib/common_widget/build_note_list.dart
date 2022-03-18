@@ -8,8 +8,9 @@ import 'package:mr_note_clone/ui/Note_Detail/note_detail.dart';
 
 class BuildNoteList extends StatefulWidget {
   final bool isSorted;
+  final int categoryID;
 
-  BuildNoteList({this.isSorted});
+  BuildNoteList({this.isSorted, this.categoryID});
 
   @override
   _BuildNoteListState createState() => _BuildNoteListState();
@@ -24,10 +25,13 @@ class _BuildNoteListState extends State<BuildNoteList> {
 
   bool isSorted;
 
+  int categoryID;
+
   @override
   void initState() {
     super.initState();
     isSorted = widget.isSorted;
+    categoryID = widget.categoryID;
   }
 
   @override
@@ -160,6 +164,11 @@ class _BuildNoteListState extends State<BuildNoteList> {
     if (isSorted != null) {
       String suan = DateTime.now().toString().substring(0, 10);
       allNotes = await databaseHelper.getSortNoteList(suan);
+    } else if (categoryID != null) {
+      if (categoryID == 0)
+        allNotes = await databaseHelper.getNoteList();
+      else
+        allNotes = await databaseHelper.getCategoryNotesList(categoryID);
     }
   }
 
