@@ -1,4 +1,4 @@
-class Note {
+class Note implements Comparable<Note> {
   int id;
   int categoryID;
   String categoryTitle;
@@ -35,4 +35,14 @@ class Note {
         "time": time,
         "priority": priority
       };
+
+  @override
+  int compareTo(Note other) {
+    if (this.priority > other.priority)
+      return -1;
+    else if (this.priority < other.priority)
+      return 1;
+    else
+      return 0;
+  }
 }

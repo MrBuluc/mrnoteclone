@@ -169,6 +169,7 @@ class _BuildNoteListState extends State<BuildNoteList> {
         allNotes = await databaseHelper.getNoteList();
       else
         allNotes = await databaseHelper.getCategoryNotesList(categoryID);
+      allNotes.sort();
     }
   }
 

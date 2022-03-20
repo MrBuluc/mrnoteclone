@@ -30,7 +30,6 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    lenghtNotes();
     return SafeArea(
         child: Scaffold(
       backgroundColor: scaffoldColor,
